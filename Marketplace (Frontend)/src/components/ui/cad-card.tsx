@@ -18,6 +18,7 @@ interface CadCardProps {
   software: string[];
   className?: string;
   onWalletRequired?: () => void;
+  royalty?: number;
 }
 
 export function CadCard({
@@ -32,6 +33,7 @@ export function CadCard({
   software,
   className,
   onWalletRequired,
+  royalty,
 }: CadCardProps) {
   const navigate = useNavigate();
   const { user } = useUser();
@@ -67,13 +69,14 @@ export function CadCard({
   return (
     <Card
       className={cn(
-        'group cursor-pointer overflow-hidden bg-card border border-border/50 rounded-2xl',
-        'hover:border-border hover:shadow-lg transition-all duration-300',
+        'group cursor-pointer overflow-hidden bg-card/60 backdrop-blur-md border border-border/40 rounded-2xl',
+        'hover:border-primary/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1',
         className
       )}
       onClick={handleCardClick}
     >
-      <CardContent className='p-0'>
+      <CardContent className='p-0 relative'>
+        <div className='absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none' />
         {/* Image */}
         <div className='relative aspect-[4/3] overflow-hidden bg-muted'>
           <img
@@ -113,9 +116,16 @@ export function CadCard({
 
           <div className='flex items-center justify-between text-xs text-muted-foreground mb-2'>
             <span className='truncate'>{seller}</span>
-            <div className='flex items-center gap-0.5'>
-              <Star className='h-3 w-3 fill-amber-400 text-amber-400' />
-              <span>{rating.toFixed(1)}</span>
+            <div className='flex flex-col items-end gap-0.5'>
+              <div className='flex items-center gap-0.5'>
+                <Star className='h-3 w-3 fill-amber-400 text-amber-400' />
+                <span>{rating.toFixed(1)}</span>
+              </div>
+              {royalty !== undefined && royalty > 0 && (
+                <span className='text-[10px] text-primary/80 font-medium'>
+                  {royalty}% Royalty
+                </span>
+              )}
             </div>
           </div>
 
