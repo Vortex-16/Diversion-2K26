@@ -1,0 +1,233 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ChainTorque Marketplace - Clean, Minimal & Elegant Design System */
+
+@layer base {
+  :root {
+    /* Light Mode - Clean & Minimal */
+    --background: 0 0% 99%;
+    --foreground: 220 20% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+
+    /* Refined Blue Primary */
+    --primary: 220 90% 56%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 220 85% 50%;
+
+    /* Soft Purple Accent */
+    --secondary: 250 60% 60%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 15% 96%;
+    --muted-foreground: 220 10% 50%;
+
+    --accent: 250 60% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 92%;
+    --input: 220 15% 92%;
+    --ring: 220 90% 56%;
+
+    /* Clean palette variables */
+    --engineering-blue: 220 90% 56%;
+    --technical-gray: 220 10% 50%;
+    --success-green: 150 60% 42%;
+    --warning-orange: 35 90% 55%;
+
+    /* Elegant gradients */
+    --gradient-primary: linear-gradient(135deg,
+        hsl(220 90% 56%),
+        hsl(250 60% 60%));
+    --gradient-hero: linear-gradient(160deg,
+        hsl(220 90% 56% / 0.9),
+        hsl(250 60% 60% / 0.85));
+    --gradient-card: linear-gradient(145deg,
+        hsl(0 0% 100%),
+        hsl(220 15% 98%));
+
+    /* Subtle, elegant shadows */
+    --shadow-xs: 0 1px 2px 0 hsl(220 20% 10% / 0.03);
+    --shadow-card: 0 1px 3px 0 hsl(220 20% 10% / 0.04), 0 1px 2px -1px hsl(220 20% 10% / 0.03);
+    --shadow-card-hover: 0 8px 24px -4px hsl(220 90% 56% / 0.12), 0 4px 8px -2px hsl(220 20% 10% / 0.04);
+    --shadow-professional: 0 16px 48px -8px hsl(220 20% 10% / 0.08);
+    --shadow-glow: 0 0 24px hsl(220 90% 56% / 0.15);
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 99%;
+    --sidebar-foreground: 220 10% 30%;
+    --sidebar-primary: 220 90% 56%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 15% 96%;
+    --sidebar-accent-foreground: 220 10% 30%;
+    --sidebar-border: 220 15% 92%;
+    --sidebar-ring: 220 90% 56%;
+  }
+
+  .dark {
+    /* Dark Mode - Elegant & Refined */
+    --background: 220 20% 7%;
+    --foreground: 220 15% 95%;
+
+    --card: 220 20% 10%;
+    --card-foreground: 220 15% 95%;
+
+    --popover: 220 20% 10%;
+    --popover-foreground: 220 15% 95%;
+
+    /* Bright primary for dark mode */
+    --primary: 220 90% 65%;
+    --primary-foreground: 220 20% 7%;
+    --primary-hover: 220 85% 70%;
+
+    /* Softer purple */
+    --secondary: 250 60% 68%;
+    --secondary-foreground: 220 20% 7%;
+
+    --muted: 220 20% 14%;
+    --muted-foreground: 220 15% 60%;
+
+    --accent: 250 60% 68%;
+    --accent-foreground: 220 20% 7%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 220 15% 95%;
+
+    --border: 220 20% 16%;
+    --input: 220 20% 16%;
+    --ring: 220 90% 65%;
+
+    /* Dark mode palette */
+    --engineering-blue: 220 90% 65%;
+    --technical-gray: 220 15% 60%;
+    --success-green: 150 60% 50%;
+    --warning-orange: 35 90% 60%;
+
+    /* Dark mode gradients */
+    --gradient-primary: linear-gradient(135deg,
+        hsl(220 90% 65%),
+        hsl(250 60% 68%));
+    --gradient-hero: linear-gradient(160deg,
+        hsl(220 90% 65% / 0.9),
+        hsl(250 60% 68% / 0.85));
+    --gradient-card: linear-gradient(145deg,
+        hsl(220 20% 10%),
+        hsl(220 20% 12%));
+
+    /* Dark elegant shadows */
+    --shadow-xs: 0 1px 2px 0 hsl(0 0% 0% / 0.2);
+    --shadow-card: 0 2px 4px -1px hsl(0 0% 0% / 0.2), 0 1px 2px -1px hsl(0 0% 0% / 0.15);
+    --shadow-card-hover: 0 12px 32px -6px hsl(220 90% 65% / 0.2), 0 4px 12px -2px hsl(0 0% 0% / 0.2);
+    --shadow-professional: 0 24px 64px -12px hsl(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 32px hsl(220 90% 65% / 0.2);
+
+    --sidebar-background: 220 20% 9%;
+    --sidebar-foreground: 220 15% 95%;
+    --sidebar-primary: 220 90% 65%;
+    --sidebar-primary-foreground: 220 20% 7%;
+    --sidebar-accent: 220 20% 14%;
+    --sidebar-accent-foreground: 220 15% 95%;
+    --sidebar-border: 220 20% 16%;
+    --sidebar-ring: 220 90% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer components {
+
+  /* Glassmorphism utility */
+  .glass {
+    @apply bg-background/80 backdrop-blur-lg border border-border/50;
+  }
+
+  /* Clean card styling */
+  .card-clean {
+    @apply bg-card border border-border/60 shadow-[var(--shadow-card)] transition-all duration-300;
+  }
+
+  .card-clean:hover {
+    @apply shadow-[var(--shadow-card-hover)] border-primary/20;
+  }
+
+  /* Elegant button styling */
+  .btn-elegant {
+    @apply px-5 py-2.5 rounded-lg font-medium transition-all duration-200;
+    @apply hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
+  }
+
+  /* Subtle link underline animation */
+  .link-underline {
+    @apply relative;
+  }
+
+  .link-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-[2px] bg-primary transition-all duration-300;
+  }
+
+  .link-underline:hover::after {
+    @apply w-full;
+  }
+
+  /* Minimal badge */
+  .badge-minimal {
+    @apply px-2.5 py-0.5 text-xs font-medium rounded-md border;
+    @apply bg-transparent border-border text-muted-foreground;
+    @apply transition-colors duration-200;
+  }
+
+  .badge-minimal:hover {
+    @apply border-primary/40 text-primary;
+  }
+}
+
+/* Custom animations for 3D viewer */
+@keyframes spin-y {
+  from {
+    transform: rotateY(0deg);
+  }
+
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+.animate-spin-y {
+  animation: spin-y 4s linear infinite;
+}
+
+/* Smooth fade-in animation */
+@keyframes fade-in-smooth {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-smooth {
+  animation: fade-in-smooth 0.4s ease-out;
+}
