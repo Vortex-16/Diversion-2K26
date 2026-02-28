@@ -76,6 +76,7 @@ interface ProductModel {
   tokenId?: number;
   contractAddress?: string;
   blockchain?: string;
+  royalty?: number;
 }
 
 // Mock data for demonstration
@@ -157,6 +158,7 @@ const ProductDetail = () => {
       tokenId: backendData.tokenId ? parseInt(backendData.tokenId, 10) : undefined,
       contractAddress: CONTRACT_ADDRESS,
       blockchain: 'Ethereum',
+      royalty: backendData.royalty || 0,
     };
   };
 
@@ -358,7 +360,8 @@ const ProductDetail = () => {
           {/* Left Column - Images and 3D Viewer */}
           <div className="space-y-4">
             {/* Main Image/3D Viewer */}
-            <div className="relative aspect-square bg-muted rounded-lg overflow-hidden">
+            <div className="relative aspect-square bg-card/40 backdrop-blur-md rounded-2xl overflow-hidden border border-border/40 shadow-lg group">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10" />
               {show3D ? (
                 <Model3DViewer
                   modelUrl={model.modelUrl}
@@ -387,7 +390,7 @@ const ProductDetail = () => {
             </div>
 
             {/* Thumbnail Images */}
-            <div className="flex gap-2 overflow-x-auto pb-2">
+            <div className="flex gap-2 overflow-x-auto pb-2 p-1">
               {model.images.map((image, index) => (
                 <button
                   key={index}
@@ -395,7 +398,7 @@ const ProductDetail = () => {
                     setSelectedImage(index);
                     setShow3D(false);
                   }}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${selectedImage === index && !show3D ? 'border-primary' : 'border-transparent'
+                  className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 hover:scale-105 ${selectedImage === index && !show3D ? 'border-primary shadow-md' : 'border-transparent opacity-70 hover:opacity-100'
                     }`}
                 >
                   <img src={image} alt={`${model.title} view ${index + 1}`} className="w-full h-full object-cover" />
@@ -405,7 +408,7 @@ const ProductDetail = () => {
               {model.modelUrl && !model.modelUrl.includes('.SLDPRT') && !model.modelUrl.includes('.SLDASM') && (
                 <button
                   onClick={() => setShow3D(true)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg border-2 transition-colors bg-muted flex items-center justify-center ${show3D ? 'border-primary' : 'border-transparent'
+                  className={`flex-shrink-0 w-20 h-20 rounded-xl border-2 transition-all duration-300 bg-muted/50 backdrop-blur-sm flex items-center justify-center hover:scale-105 ${show3D ? 'border-primary shadow-md text-primary' : 'border-transparent text-muted-foreground opacity-70 hover:opacity-100'
                     }`}
                 >
                   <Play className="h-6 w-6 text-muted-foreground" />
@@ -440,6 +443,11 @@ const ProductDetail = () => {
                 <div className="flex flex-col">
                   <span className="text-3xl font-bold text-primary">{model.price}</span>
                   {model.priceETH && <span className="text-muted-foreground">≈ {model.priceETH} ETH</span>}
+                  {model.royalty !== undefined && model.royalty > 0 && (
+                    <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400 mt-1">
+                      {model.royalty}% Creator Royalty
+                    </span>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={toggleWishlist} className={isWishlisted ? 'text-red-500 border-red-500' : ''}>
@@ -457,7 +465,7 @@ const ProductDetail = () => {
               <Button
                 size="lg"
                 className={hasWallet
-                  ? "w-full bg-gradient-primary hover:bg-primary-hover"
+                  ? "w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:opacity-90 hover:shadow-lg hover:shadow-purple-500/25 text-white transition-all duration-300 transform hover:-translate-y-0.5 border-0 font-medium tracking-wide"
                   : "w-full bg-muted text-muted-foreground cursor-not-allowed opacity-60"
                 }
                 onClick={handlePurchase}
@@ -502,7 +510,7 @@ const ProductDetail = () => {
             </div>
 
             {/* Seller Info */}
-            <Card>
+            <Card className="bg-card/40 backdrop-blur-md border border-border/40 shadow-sm">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -530,7 +538,7 @@ const ProductDetail = () => {
             </Card>
 
             {/* Quick Specs */}
-            <Card>
+            <Card className="bg-card/40 backdrop-blur-md border border-border/40 shadow-sm">
               <CardHeader>
                 <CardTitle className="text-lg">Specifications</CardTitle>
               </CardHeader>
@@ -565,16 +573,16 @@ const ProductDetail = () => {
         </div>
 
         {/* Detailed Tabs */}
-        <Tabs defaultValue="description" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="description" className="w-full mt-10">
+          <TabsList className="grid w-full grid-cols-4 bg-muted/50 p-1 rounded-xl">
             <TabsTrigger value="description">Description</TabsTrigger>
             <TabsTrigger value="specifications">Specifications</TabsTrigger>
             <TabsTrigger value="reviews">Reviews ({model.stats.reviews})</TabsTrigger>
             <TabsTrigger value="seller">Seller Info</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="description" className="mt-6">
-            <Card>
+          <TabsContent value="description" className="mt-6 animation-fade-in">
+            <Card className="bg-card/40 backdrop-blur-md border border-border/40 shadow-sm">
               <CardContent className="p-6">
                 <div className="prose prose-gray max-w-none">
                   <div className="whitespace-pre-line text-foreground leading-relaxed">{model.description}</div>
@@ -594,8 +602,8 @@ const ProductDetail = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="specifications" className="mt-6">
-            <Card>
+          <TabsContent value="specifications" className="mt-6 animation-fade-in">
+            <Card className="bg-card/40 backdrop-blur-md border border-border/40 shadow-sm">
               <CardContent className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
@@ -661,8 +669,8 @@ const ProductDetail = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="reviews" className="mt-6">
-            <Card>
+          <TabsContent value="reviews" className="mt-6 animation-fade-in">
+            <Card className="bg-card/40 backdrop-blur-md border border-border/40 shadow-sm">
               <CardContent className="p-6">
                 <div className="text-center text-muted-foreground">
                   <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -673,8 +681,8 @@ const ProductDetail = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="seller" className="mt-6">
-            <Card>
+          <TabsContent value="seller" className="mt-6 animation-fade-in">
+            <Card className="bg-card/40 backdrop-blur-md border border-border/40 shadow-sm">
               <CardContent className="p-6">
                 <div className="text-center text-muted-foreground">
                   <User className="h-12 w-12 mx-auto mb-4 opacity-50" />
