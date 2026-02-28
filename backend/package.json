@@ -1,0 +1,32 @@
+{
+  "name": "chaintorque-backend",
+  "version": "1.0.0",
+  "description": "ChainTorque Marketplace Backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat run scripts/deploy.js --network localhost",
+    "node": "npx hardhat node"
+  },
+  "keywords": [
+    "web3",
+    "backend",
+    "express",
+    "hardhat"
+  ],
+  "author": "ChainTorque Team",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "ethers": "^6.16.0",
+    "express": "^5.2.1",
+    "mongoose": "^9.0.1",
+    "multer": "^2.0.2"
+  }
+}
