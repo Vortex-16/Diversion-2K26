@@ -1,0 +1,274 @@
+# DigitalOcean App Platform Specification
+# This file configures all 4 ChainTorque services for automatic deployment
+# Upload this file when creating a new app in DigitalOcean App Platform
+# Or use: doctl apps create --spec .do/app.yaml
+
+name: chaintorque
+region: nyc
+
+# Ingress Configuration (Optional - for custom routing)
+ingress:
+  rules:
+    - component:
+        name: chaintorque-landing
+      match:
+        path:
+          prefix: /
+
+services:
+  # ============================================================
+  # 1. Backend API Service (Express + MongoDB + Web3)
+  # ============================================================
+  - name: chaintorque-backend
+    github:
+      repo: YOUR_GITHUB_USERNAME/ChainTorque
+      branch: main
+      deploy_on_push: true
+    source_dir: /backend
+    
+    # Environment
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "8080"
+      - key: MONGODB_URI
+        value: YOUR_MONGODB_URI
+        type: SECRET
+      - key: RPC_URL
+        value: YOUR_ETHEREUM_RPC_URL
+        type: SECRET
+      - key: PRIVATE_KEY
+        value: YOUR_WALLET_PRIVATE_KEY
+        type: SECRET
+      - key: CONTRACT_ADDRESS
+        value: YOUR_CONTRACT_ADDRESS
+      - key: LIGHTHOUSE_API_KEY
+        value: YOUR_LIGHTHOUSE_KEY
+        type: SECRET
+      - key: CLERK_PUBLISHABLE_KEY
+        value: YOUR_CLERK_KEY
+      - key: NODE_NO_WARNINGS
+        value: "1"
+      - key: GROQ_API_KEY
+        value: YOUR_GROQ_KEY
+        type: SECRET
+      - key: HF_TOKEN
+        value: YOUR_HUGGINGFACE_TOKEN
+        type: SECRET
+    
+    # Build Configuration
+    build_command: npm install --legacy-peer-deps
+    
+    # Run Configuration
+    run_command: npm start
+    
+    # HTTP Configuration
+    http_port: 8080
+    
+    # Health Check
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 10
+      period_seconds: 30
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+    
+    # Resources
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    
+    # Routes
+    routes:
+      - path: /api
+      - path: /health
+
+  # ============================================================
+  # 2. Landing Page Frontend (React + TypeScript + Vite)
+  # ============================================================
+  - name: chaintorque-landing
+    type: static_site
+    github:
+      repo: YOUR_GITHUB_USERNAME/ChainTorque
+      branch: main
+      deploy_on_push: true
+    source_dir: /Landing Page (Frontend)
+    
+    # Environment
+    envs:
+      - key: VITE_CLERK_PUBLISHABLE_KEY
+        value: YOUR_CLERK_KEY
+      - key: VITE_MARKETPLACE_URL
+        value: ${chaintorque-marketplace.PUBLIC_URL}
+      - key: VITE_CAD_URL
+        value: ${chaintorque-cad.PUBLIC_URL}
+      - key: VITE_API_URL
+        value: ${chaintorque-backend.PUBLIC_URL}/api
+    
+    # Build Configuration
+    build_command: npm install --legacy-peer-deps && npm run build
+    
+    # Output Directory
+    output_dir: dist
+    
+    # Routing (SPA)
+    routes:
+      - path: /
+    
+    # Error/Catchall Page (SPA routing)
+    catchall_document: index.html
+    
+    # Static Site Configuration
+    static_sites:
+      - catchall_document: index.html
+        error_document: index.html
+
+  # ============================================================
+  # 3. Marketplace Frontend (React + TypeScript + Vite + Web3)
+  # ============================================================
+  - name: chaintorque-marketplace
+    type: static_site
+    github:
+      repo: YOUR_GITHUB_USERNAME/ChainTorque
+      branch: main
+      deploy_on_push: true
+    source_dir: /Marketplace (Frontend)
+    
+    # Environment
+    envs:
+      - key: VITE_CLERK_PUBLISHABLE_KEY
+        value: YOUR_CLERK_KEY
+      - key: VITE_API_URL
+        value: ${chaintorque-backend.PUBLIC_URL}/api
+      - key: VITE_CONTRACT_ADDRESS
+        value: YOUR_CONTRACT_ADDRESS
+      - key: VITE_LANDING_URL
+        value: ${chaintorque-landing.PUBLIC_URL}
+      - key: VITE_CAD_URL
+        value: ${chaintorque-cad.PUBLIC_URL}
+    
+    # Build Configuration
+    build_command: npm install --legacy-peer-deps && npm run build
+    
+    # Output Directory
+    output_dir: dist
+    
+    # Routing (SPA)
+    routes:
+      - path: /marketplace
+      - path: /product
+      - path: /upload
+      - path: /dashboard
+      - path: /edit
+    
+    # Error/Catchall Page (SPA routing)
+    catchall_document: index.html
+    
+    # Static Site Configuration
+    static_sites:
+      - catchall_document: index.html
+        error_document: index.html
+
+  # ============================================================
+  # 4. CAD Editor Frontend (React + Vite + Three.js + OpenCascade)
+  # ============================================================
+  - name: chaintorque-cad
+    type: static_site
+    github:
+      repo: YOUR_GITHUB_USERNAME/ChainTorque
+      branch: main
+      deploy_on_push: true
+    source_dir: /CAD (Frontend)
+    
+    # Environment (No secrets needed - fully client-side)
+    envs:
+      - key: GENERATE_SOURCEMAP
+        value: "false"
+    
+    # Build Configuration
+    build_command: npm install --legacy-peer-deps && npm run build
+    
+    # Output Directory
+    output_dir: build
+    
+    # Routing (SPA)
+    routes:
+      - path: /cad
+    
+    # Error/Catchall Page (SPA routing)
+    catchall_document: index.html
+    
+    # Static Site Configuration
+    static_sites:
+      - catchall_document: index.html
+        error_document: index.html
+
+# ============================================================
+# Optional: Database (MongoDB)
+# Note: We recommend using MongoDB Atlas instead
+# ============================================================
+# databases:
+#   - name: chaintorque-db
+#     engine: MONGODB
+#     version: "6"
+#     production: false
+
+# ============================================================
+# Optional: Worker Service (for background jobs)
+# ============================================================
+# workers:
+#   - name: chaintorque-listener
+#     github:
+#       repo: YOUR_GITHUB_USERNAME/ChainTorque
+#       branch: main
+#       deploy_on_push: true
+#     source_dir: /backend
+#     envs:
+#       - key: NODE_ENV
+#         value: production
+#       # ... (same as backend)
+#     build_command: npm install --legacy-peer-deps
+#     run_command: node services/eventListener.js
+
+# ============================================================
+# Jobs (One-time or Scheduled Tasks)
+# ============================================================
+# jobs:
+#   - name: db-wipe
+#     github:
+#       repo: YOUR_GITHUB_USERNAME/ChainTorque
+#       branch: main
+#     source_dir: /backend
+#     envs:
+#       # ... (same as backend)
+#     build_command: npm install
+#     run_command: node scripts/wipe_db.js
+#     kind: PRE_DEPLOY  # or POST_DEPLOY, FAILED_DEPLOY
+
+# ============================================================
+# Alerts
+# ============================================================
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
+
+# ============================================================
+# Notes for Deployment
+# ============================================================
+# 
+# 1. Replace ALL instances of "YOUR_" with your actual values
+# 2. Keep sensitive values (PRIVATE_KEY, MONGODB_URI) as SECRETs
+# 3. Use doctl CLI or DigitalOcean dashboard to upload this spec
+# 4. After first deployment, get PUBLIC URLs and update environment variables
+# 
+# CLI Deployment:
+#   doctl apps create --spec .do/app.yaml
+#   doctl apps update YOUR_APP_ID --spec .do/app.yaml
+# 
+# Dashboard Deployment:
+#   1. Go to Apps → Create App
+#   2. Choose "Import existing project from GitHub"
+#   3. Select repository
+#   4. Click "Edit your App Spec" → Paste this YAML
+#   5. Review and Create
