@@ -15,6 +15,8 @@ router.get('/', async (req, res) => {
         // Fetch from MongoDB
         const items = await MarketItem.find({ status: 'active' }).sort({ createdAt: -1 });
 
+        console.log(`[Marketplace GET] Returning ${items.length} active items. TokenIds: [${items.map(i => i.tokenId).join(', ')}]`);
+
         res.json({
             success: true,
             data: items,
@@ -203,17 +205,24 @@ router.post('/sync-creation', async (req, res) => {
         }
 
         if (!foundEvent) {
+            console.log(`[Sync Creation] ERROR: MarketItemCreated event not found for token ${tokenId}`);
             return res.status(400).json({
                 success: false,
                 message: 'Transaction does not contain valid MarketItemCreated event for this token.'
             });
         }
 
+        console.log(`[Sync Creation] ✅ Found valid MarketItemCreated event for token ${tokenId}`);
+
         // Check if already synced (idempotent)
+        console.log(`[Sync Creation] Checking if token ${tokenId} already exists in database...`);
         const existingItem = await MarketItem.findOne({ tokenId: parseInt(tokenId) });
         if (existingItem) {
+            console.log(`[Sync Creation] ⚠️ Item already synced (Idempotent) - token ${tokenId}`);
             return res.json({ success: true, message: 'Item already synced (Idempotent)', tokenId });
         }
+
+        console.log(`[Sync Creation] Token ${tokenId} not found in DB, creating new item...`);
 
         // Save to database with correct seller and creator address
         const newItem = new MarketItem({
@@ -239,7 +248,16 @@ router.post('/sync-creation', async (req, res) => {
             status: 'active'
         });
 
-        await newItem.save();
+        try {
+            await newItem.save();
+        } catch (saveError) {
+            // Handle duplicate key error (E11000) - race condition with eventListener
+            if (saveError.code === 11000 || saveError.message?.includes('duplicate key')) {
+                console.log(`[Sync Creation] ℹ️ Item #${tokenId} already exists (race condition - returning success)`);
+                return res.json({ success: true, message: 'Item already synced (Race condition handled)', tokenId });
+            }
+            throw saveError; // Re-throw other errors
+        }
 
         // Update user stats (non-blocking - don't let stat update fail the sync)
         try {
@@ -272,8 +290,9 @@ router.post('/sync-creation', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Sync creation error:', error.message);
-        res.status(500).json({ success: false, error: error.message });
+        console.error('[Sync Creation] ERROR:', error.message);
+        console.error('[Sync Creation] Stack:', error.stack);
+        res.status(500).json({ success: false, error: error.message, message: 'Failed to sync NFT creation to database' });
     }
 });
 
